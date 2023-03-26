@@ -10,6 +10,7 @@ BH_PATH="/opt/bloodhound"
 SLIVER_PATH="/opt/sliver"
 HAVOC_PATH="/opt/havoc"
 NGINX_PATH="/opt/nginx"
+ARTIFACTS_PATH="/opt/artifacts"
 
 # Download BloodHound with ADCS support
 sudo mkdir -p $BH_PATH
@@ -43,3 +44,7 @@ cd $CURPATH
 sudo mkdir -p $NGINX_PATH
 sudo chown $USER:$USER $NGINX_PATH
 cp -r /mnt/hgfs/Private/OSEP/c2/nginx $NGINX_PATH
+
+sudo mkdir -p $ARTIFACTS_PATH
+sudo chown $USER:$USER $ARTIFACTS_PATH
+git clone https://github.com/Flangvik/SharpCollection.git $ARTIFACTS_PATH/SharpCollection
