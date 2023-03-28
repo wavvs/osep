@@ -83,6 +83,9 @@ artifacts() {
     wget https://github.com/sandialabs/wiretap/releases/latest/download/wiretap_0.2.1_windows_amd64.tar.gz -O $ARTIFACTS_PATH/wiretap-wnd.tar.gz
     tar -xf $ARTIFACTS_PATH/wiretap-wnd.tar.gz -C $ARTIFACTS_PATH && mv $ARTIFACTS_PATH/wiretap.exe $ARTIFACTS_PATH/wiretap-wnd.exe
     rm $ARTIFACTS_PATH/wiretap-wnd.tar.gz
+    # mimikatz
+    wget https://github.com/gentilkiwi/mimikatz/releases/latest/download/mimikatz_trunk.zip -O $ARTIFACTS_PATH/mimikatz.zip
+    unzip $ARTIFACTS_PATH/mimikatz.zip -d $ARTIFACTS_PATH/mimikatz && rm $ARTIFACTS_PATH/mimikatz.zip
 }
 
 all() {
