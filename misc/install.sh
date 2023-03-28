@@ -47,4 +47,13 @@ cp -r /mnt/hgfs/Private/OSEP/c2/nginx $NGINX_PATH
 
 sudo mkdir -p $ARTIFACTS_PATH
 sudo chown $USER:$USER $ARTIFACTS_PATH
+
 git clone https://github.com/Flangvik/SharpCollection.git $ARTIFACTS_PATH/SharpCollection
+git clone https://github.com/wavvs/doctrack $ARTIFACTS_PATH/doctrack
+cd $ARTIFACTS_PATH/doctrack
+dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true
+dotnet publish -r linux-x64 -c Release /p:PublishSingleFile=true
+cp $ARTIFACTS_PATH/doctrack/doctrack/bin/Release/net6.0/linux-x64/publish/doctrack $ARTIFACTS_PATH/doctrack-lnx
+cp $ARTIFACTS_PATH/doctrack/doctrack/bin/Release/net6.0/win-x64/publish/doctrack.exe $ARTIFACTS_PATH/doctrack-wnd
+rm -rf $ARTIFACTS_PATH/doctrack
+cd $CURPATH
