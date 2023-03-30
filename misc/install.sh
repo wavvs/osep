@@ -57,35 +57,51 @@ nginx(){
 artifacts() {
     sudo mkdir -p $ARTIFACTS_PATH
     sudo chown $USER:$USER $ARTIFACTS_PATH
+    mkdir -p $ARTIFACTS_PATH/wnd/assemblies/curated
+    mkdir -p $ARTIFACTS_PATH/lnx
+
+    # ---------- C# assemblies to use with execute-assembly ----------
+    
     # SharpCollection
-    git clone https://github.com/Flangvik/SharpCollection.git $ARTIFACTS_PATH/SharpCollection
+    git clone https://github.com/Flangvik/SharpCollection.git $ARTIFACTS_PATH/wnd/assemblies/SharpCollection
+    # StandIn latest
+    git clone https://github.com/FuzzySecurity/StandIn.git $ARTIFACTS_PATH/wnd/assemblies/StandIn
+    # CheeseSQL (remove FodyWeavers)
+    git clone https://github.com/klezVirus/CheeseTools.git $ARTIFACTS_PATH/wnd/assemblies/CHeeseTools
+    
+    # ---------- C# assemblies ----------
+
     # doctrack
     git clone https://github.com/wavvs/doctrack $ARTIFACTS_PATH/doctrack
     cd $ARTIFACTS_PATH/doctrack
     dotnet publish -r win-x64 -c Release /p:PublishSingleFile=true
     dotnet publish -r linux-x64 -c Release /p:PublishSingleFile=true
-    cp $ARTIFACTS_PATH/doctrack/doctrack/bin/Release/net6.0/linux-x64/publish/doctrack $ARTIFACTS_PATH/doctrack-lnx
-    cp $ARTIFACTS_PATH/doctrack/doctrack/bin/Release/net6.0/win-x64/publish/doctrack.exe $ARTIFACTS_PATH/doctrack-wnd.exe
+    cp $ARTIFACTS_PATH/doctrack/doctrack/bin/Release/net6.0/linux-x64/publish/doctrack $ARTIFACTS_PATH/lnx/doctrack
+    cp $ARTIFACTS_PATH/doctrack/doctrack/bin/Release/net6.0/win-x64/publish/doctrack.exe $ARTIFACTS_PATH/wnd/doctrack.exe
     rm -rf $ARTIFACTS_PATH/doctrack
     cd $CURPATH
     # chisel
-    wget https://github.com/jpillora/chisel/releases/latest/download/chisel_1.8.1_linux_amd64.gz -O $ARTIFACTS_PATH/chisel-lnx.gz
-    cd $ARTIFACTS_PATH
-    gzip -d chisel-lnx.gz && chmod +x chisel-lnx
-    wget https://github.com/jpillora/chisel/releases/latest/download/chisel_1.8.1_windows_amd64.gz -O $ARTIFACTS_PATH/chisel-wnd.gz
-    gzip -d chisel-wnd.gz && mv chisel-wnd chisel-wnd.exe
+    wget https://github.com/jpillora/chisel/releases/latest/download/chisel_1.8.1_linux_amd64.gz -O $ARTIFACTS_PATH/lnx/chisel.gz
+    cd $ARTIFACTS_PATH/lnx
+    gzip -d chisel.gz && chmod +x chisel
+    wget https://github.com/jpillora/chisel/releases/latest/download/chisel_1.8.1_windows_amd64.gz -O $ARTIFACTS_PATH/wnd/chisel.gz
+    cd $ARTIFACTS_PATH/wnd
+    gzip -d chisel.gz && mv chisel chisel.exe
     cd $CURPATH
     # wiretap
-    wget https://github.com/sandialabs/wiretap/releases/latest/download/wiretap_0.2.1_linux_amd64.tar.gz -O $ARTIFACTS_PATH/wiretap-lnx.tar.gz
-    tar -xf $ARTIFACTS_PATH/wiretap-lnx.tar.gz -C $ARTIFACTS_PATH && mv $ARTIFACTS_PATH/wiretap $ARTIFACTS_PATH/wiretap-lnx
-    chmod +x $ARTIFACTS_PATH/wiretap-lnx
-    rm $ARTIFACTS_PATH/wiretap-lnx.tar.gz
-    wget https://github.com/sandialabs/wiretap/releases/latest/download/wiretap_0.2.1_windows_amd64.tar.gz -O $ARTIFACTS_PATH/wiretap-wnd.tar.gz
-    tar -xf $ARTIFACTS_PATH/wiretap-wnd.tar.gz -C $ARTIFACTS_PATH && mv $ARTIFACTS_PATH/wiretap.exe $ARTIFACTS_PATH/wiretap-wnd.exe
-    rm $ARTIFACTS_PATH/wiretap-wnd.tar.gz
+    wget https://github.com/sandialabs/wiretap/releases/latest/download/wiretap_0.2.1_linux_amd64.tar.gz -O $ARTIFACTS_PATH/lnx/wiretap-lnx.tar.gz
+    tar -xf $ARTIFACTS_PATH/lnx/wiretap-lnx.tar.gz -C $ARTIFACTS_PATH
+    chmod +x $ARTIFACTS_PATH/lnx/wiretap
+    rm $ARTIFACTS_PATH/lnx/wiretap-lnx.tar.gz
+    wget https://github.com/sandialabs/wiretap/releases/latest/download/wiretap_0.2.1_windows_amd64.tar.gz -O $ARTIFACTS_PATH/wnd/wiretap-wnd.tar.gz
+    tar -xf $ARTIFACTS_PATH/wnd/wiretap-wnd.tar.gz -C $ARTIFACTS_PATH
+    rm $ARTIFACTS_PATH/wnd/wiretap-wnd.tar.gz
     # mimikatz
-    wget https://github.com/gentilkiwi/mimikatz/releases/latest/download/mimikatz_trunk.zip -O $ARTIFACTS_PATH/mimikatz.zip
-    unzip $ARTIFACTS_PATH/mimikatz.zip -d $ARTIFACTS_PATH/mimikatz && rm $ARTIFACTS_PATH/mimikatz.zip
+    wget https://github.com/gentilkiwi/mimikatz/releases/latest/download/mimikatz_trunk.zip -O $ARTIFACTS_PATH/wnd/mimikatz.zip
+    unzip $ARTIFACTS_PATH/wnd/mimikatz.zip -d $ARTIFACTS_PATH/wnd/mimikatz && rm $ARTIFACTS_PATH/wnd/mimikatz.zip
+    # ysoserial.net
+    wget https://github.com/pwntester/ysoserial.net/releases/latest/download/ysoserial-1.35.zip -O $ARTIFACTS_PATH/wnd/ysoserial.zip
+    unzip $ARTIFACTS_PATH/wnd/ysoserial.zip -d $ARTIFACTS_PATH/wnd/ysoserial && rm $ARTIFACTS_PATH/wnd/ysoserial.zip
 }
 
 all() {

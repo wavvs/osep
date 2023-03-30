@@ -1,0 +1,23 @@
+[
+    {
+      "event_type": "session-connected",
+      "commands": [
+        "info",
+        "pwd",
+        "ls \"Users\"",
+        "getprivs",
+        "sa-whoami",
+        "sa-get-netsession",
+        "sa-arp",
+        "sa-ipconfig",
+        "sa-listdns",
+        "sa-netstat",
+        "sa-routeprint",
+        "sa-tasklist",
+        "sa-netshares",
+        "seatbelt dotnet",
+        "seatbelt namedpipes",
+        "seatbelt uac"
+      ]
+    }
+  ]

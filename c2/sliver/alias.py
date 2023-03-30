@@ -15,7 +15,7 @@ config = {
     "allow_args": True,
     "default_args": "",
     "is_reflective": False,
-    "is_assembly": False,
+    "is_assembly": True,
     "files": [
     ]
 }
