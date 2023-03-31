@@ -4,7 +4,7 @@
       "commands": [
         "info",
         "pwd",
-        "ls \"Users\"",
+        "ls \"C:\\Users\"",
         "getprivs",
         "sa-whoami",
         "sa-get-netsession",

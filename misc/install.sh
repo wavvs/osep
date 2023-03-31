@@ -10,7 +10,7 @@ ARTIFACTS_PATH="/opt/artifacts"
 prereq(){
 # Prerequisites
     sudo apt update
-    sudo apt install -y terminator neo4j golang-go docker.io
+    sudo apt install -y terminator neo4j golang-go docker.io krb5-user rdate
     sudo apt install -y git build-essential apt-utils cmake libfontconfig1 libglu1-mesa-dev libgtest-dev libspdlog-dev libboost-all-dev libncurses5-dev libgdbm-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev libbz2-dev mesa-common-dev qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools libqt5websockets5 libqt5websockets5-dev qtdeclarative5-dev golang-go qtbase5-dev libqt5websockets5-dev libspdlog-dev python3-dev libboost-all-dev mingw-w64 nasm
     sudo systemctl enable docker --now
 }
@@ -59,6 +59,7 @@ artifacts() {
     sudo chown $USER:$USER $ARTIFACTS_PATH
     mkdir -p $ARTIFACTS_PATH/wnd/assemblies/curated
     mkdir -p $ARTIFACTS_PATH/lnx
+    mkdir -p $ARTIFACTS_PATH/other
 
     # ---------- C# assemblies to use with execute-assembly ----------
     
@@ -67,7 +68,8 @@ artifacts() {
     # StandIn latest
     git clone https://github.com/FuzzySecurity/StandIn.git $ARTIFACTS_PATH/wnd/assemblies/StandIn
     # CheeseSQL (remove FodyWeavers)
-    git clone https://github.com/klezVirus/CheeseTools.git $ARTIFACTS_PATH/wnd/assemblies/CHeeseTools
+    git clone https://github.com/klezVirus/CheeseTools.git $ARTIFACTS_PATH/wnd/assemblies/CheeseTools
+    wget https://github.com/mitchmoser/SharpShares/releases/latest/download/SharpShares.exe -O $ARTIFACTS_PATH/wnd/assemblies/curated
     
     # ---------- C# assemblies ----------
 
@@ -102,6 +104,24 @@ artifacts() {
     # ysoserial.net
     wget https://github.com/pwntester/ysoserial.net/releases/latest/download/ysoserial-1.35.zip -O $ARTIFACTS_PATH/wnd/ysoserial.zip
     unzip $ARTIFACTS_PATH/wnd/ysoserial.zip -d $ARTIFACTS_PATH/wnd/ysoserial && rm $ARTIFACTS_PATH/wnd/ysoserial.zip
+
+    # ----------- Other --------------
+    # nanorobeus
+    git clone https://github.com/wavvs/nanorobeus.git $ARTIFACTS_PATH/other/nanorobeus
+    cd $ARTIFACTS_PATH/other/nanorobeus && make bof
+    cp sample_sliver.json  ARTIFACTS_PATH/other/extension.json
+    cp dist/* $ARTIFACTS_PATH/other
+    cd ..
+    rm -rf $ARTIFACTS_PATH/other/nanorobeus
+    mkdir -p $ARTIFACTS_PATH/other/nanorobeus
+    mv nanorobeus.x* $ARTIFACTS_PATH/other/nanorobeus
+    mv extension.json $ARTIFACTS_PATH/other/nanorobeus
+    cd $CURPATH
+    git clone https://github.com/skelsec/minikerberos.git $ARTIFACTS_PATH/other/minikerberos
+    cd $ARTIFACTS_PATH/other/minikerberos
+    sudo python3 setup.py install
+    cd $CURPATH
+    # ----------- Other --------------
 }
 
 all() {
