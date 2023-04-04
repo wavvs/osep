@@ -17,7 +17,8 @@
         "sa-netshares",
         "seatbelt dotnet",
         "seatbelt namedpipes",
-        "seatbelt uac"
+        "seatbelt uac",
+        "seatbelt scheduledtasks"
       ]
     }
   ]
