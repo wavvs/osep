@@ -11,8 +11,9 @@ WORDLISTS_PATH="/opt/wordlists"
 prereq(){
 # Prerequisites
     sudo apt update
-    sudo apt install -y terminator neo4j golang-go docker.io krb5-user rdate
+    sudo apt install -y terminator neo4j golang-go docker.io krb5-user rdate libssl-dev libcurl4-openssl-dev
     sudo apt install -y git build-essential apt-utils cmake libfontconfig1 libglu1-mesa-dev libgtest-dev libspdlog-dev libboost-all-dev libncurses5-dev libgdbm-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev libbz2-dev mesa-common-dev qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools libqt5websockets5 libqt5websockets5-dev qtdeclarative5-dev golang-go qtbase5-dev libqt5websockets5-dev libspdlog-dev python3-dev libboost-all-dev mingw-w64 nasm
+    sudo apt install -y osslcodesign
     sudo systemctl enable docker --now
 }
 
@@ -118,6 +119,18 @@ artifacts() {
     wget https://github.com/andrew-d/static-binaries/raw/master/binaries/windows/x86/nmap.exe -O $ARTIFACTS_PATH/wnd/nmap.exe
     # linpeas
     wget https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas_linux_amd64 -O $ARTIFACTS_PATH/lnx/linpeas.sh
+    # graptcp
+    git clone https://github.com/hmgle/graftcp.git $ARTIFACTS_PATH/lnx/graftcp
+    cd $ARTIFACTS_PATH/lnx/graftcp && make
+    cd $CURPATH
+    # osslsigncode
+    # git clone https://github.com/mtrojnar/osslsigncode.git  $ARTIFACTS_PATH/lnx/osslsigncode
+    # mkdir -p $ARTIFACTS_PATH/lnx/osslsigncode/build && cd $ARTIFACTS_PATH/lnx/osslsigncode/build
+    # cmake -S .. && cmake --build .
+    # cd $CURPATH
+    # wix
+    dotnet tool install --global wix --version 4.0.0-rc.4
+    sudo apt install wixl
 
     # ----------- AD & Kerberos --------------
     # nanorobeus
@@ -145,6 +158,11 @@ artifacts() {
     # AD bridge open
     wget https://github.com/BeyondTrust/pbis-open/releases/download/9.1.0/pbis-open-9.1.0.551.linux.x86_64.deb.sh -O $ARTIFACTS_PATH/lnx/pbis.sh
     chmod +x $ARTIFACTS_PATH/lnx/pbis.sh && sudo sh $ARTIFACTS_PATH/lnx/pbis.sh && rm $ARTIFACTS_PATH/lnx/pbis.sh
+    # kerbrute, doesn't work with proxy (UDP)
+    wget https://github.com/ropnop/kerbrute/releases/latest/download/kerbrute_linux_amd64 -O $ARTIFACTS_PATH/lnx/kerbrute
+    chmod +x $ARTIFACTS_PATH/lnx/kerbrute
+    sudo pip3 install kerbrute
+    sudo pip3 install pyldapsearch
     # ----------- AD & Kerberos --------------
 }
 

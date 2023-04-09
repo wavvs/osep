@@ -6,7 +6,7 @@ import base64
 from minikerberos.common.ccache import CCACHE
 from minikerberos.common.kirbi import Kirbi
 
-# cat <file> | grep "doIF" | sed 's/ //g'
+# cat <file> | grep "doI" | sed 's/ //g'
 
 @click.command()
 @click.option('--input', '-i', type=click.File('r'), default=sys.stdin, help='Input base64-encoded tickets')

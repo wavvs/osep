@@ -27,7 +27,7 @@ COMMANDS = {
             #SHARPHOUND_EXE: [
                 #f'-c All,GPOLocalGroup --zipfilename triage.zip --collectallproperties --zippassword V3ryStr0ngP@ss --randomfilenames'
             #],
-            SHARPSHARES_EXE: ['/ldap:all /filter:sysvol,netlogon,ipc$,print$']
+            SHARPSHARES_EXE: ['/ldap:all /filter:sysvol,netlogon,ipc$,print$ /verbose']
         },
     'triage': {
 
