@@ -1,45 +1,53 @@
 #!/bin/bash
 
 CURPATH=$(pwd)
-BH_PATH="/opt/bloodhound"
-SLIVER_PATH="/opt/sliver"
-HAVOC_PATH="/opt/havoc"
-NGINX_PATH="/opt/nginx"
-ARTIFACTS_PATH="/opt/artifacts"
-WORDLISTS_PATH="/opt/wordlists"
+BH_PATH="/proj/bloodhound"
+SLIVER_PATH="/proj/sliver"
+HAVOC_PATH="/proj/havoc"
+NGINX_PATH="/proj/nginx"
+ARTIFACTS_PATH="/proj/artifacts"
+WORDLISTS_PATH="/proj/wordlists"
 
 prereq(){
 # Prerequisites
+    sudo mkdir -p /proj
+    sudo chown $USER:$USER /proj
     sudo apt update
     sudo apt install -y terminator neo4j golang-go docker.io krb5-user rdate libssl-dev libcurl4-openssl-dev
     sudo apt install -y git build-essential apt-utils cmake libfontconfig1 libglu1-mesa-dev libgtest-dev libspdlog-dev libboost-all-dev libncurses5-dev libgdbm-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev libbz2-dev mesa-common-dev qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools libqt5websockets5 libqt5websockets5-dev qtdeclarative5-dev golang-go qtbase5-dev libqt5websockets5-dev libspdlog-dev python3-dev libboost-all-dev mingw-w64 nasm
-    sudo apt install -y osslcodesign
+    sudo apt install -y osslsigncode
     sudo systemctl enable docker --now
+    wget https://bootstrap.pypa.io/pip/2.7/get-pip.py -O /tmp/get-pip.py
+    sudo python2 /tmp/get-pip.py
+    sudo pip2 install --upgrade setuptools
+    rm /tmp/get-pip.py
 }
 
 bh() {
     # Download BloodHound with ADCS support
-    sudo mkdir -p $BH_PATH
-    sudo chown $USER:$USER $BH_PATH
+    mkdir -p $BH_PATH
     wget https://github.com/ly4k/BloodHound/releases/latest/download/BloodHound-linux-x64.zip -O $BH_PATH/BloodHound-linux-x64.zip
     unzip "$BH_PATH/BloodHound-linux-x64.zip" -d $BH_PATH
     # https://github.com/CompassSecurity/BloodHoundQueries
-    curl -o ~/.config/bloodhound/customqueries.json "https://raw.githubusercontent.com/CompassSecurity/BloodHoundQueries/master/BloodHound_Custom_Queries/customqueries.json"
+    #curl -o ~/.config/bloodhound/customqueries.json "https://raw.githubusercontent.com/CompassSecurity/BloodHoundQueries/master/BloodHound_Custom_Queries/customqueries.json"
+    git clone https://github.com/Acceis/bqm.git $BH_PATH/bpm && cd $BH_PATH/bpm
+    mkdir -p ~/.config/bloodhound/
+    ruby bin/bqm -o ~/.config/bloodhound/customqueries.json
+    cd $CURPATHs 
 }
 
 sliver(){
     # Download Sliver
-    sudo mkdir -p $SLIVER_PATH
-    sudo chown $USER:$USER $SLIVER_PATH
+    mkdir -p $SLIVER_PATH/payloads
+    mkdir -p $SLIVER_PATH/configs/
     wget https://github.com/BishopFox/sliver/releases/latest/download/sliver-server_linux -O $SLIVER_PATH/sliver-server_linux
     chmod +x $SLIVER_PATH/sliver-server_linux
-    sudo mkdir -p $SLIVER_PATH/payloads
-    sudo chown $USER:$USER $SLIVER_PATH/payloads
+    wget https://github.com/BishopFox/sliver/releases/latest/download/sliver-client_linux -O $SLIVER_PATH/sliver-client_linux
+    chmod +x $SLIVER_PATH/sliver-client_linux
 }
 
 havoc(){
-    sudo mkdir -p $HAVOC_PATH
-    sudo chown $USER:$USER $HAVOC_PATH
+    mkdir -p $HAVOC_PATH
     git clone https://github.com/HavocFramework/Havoc.git $HAVOC_PATH
     git checkout dev
     cd $HAVOC_PATH/Client
@@ -55,12 +63,9 @@ havoc(){
 nginx(){
     sudo mkdir -p $NGINX_PATH
     sudo chown $USER:$USER $NGINX_PATH
-    cp -r /mnt/hgfs/Private/OSEP/c2/nginx $NGINX_PATH
 }
 
 artifacts() {
-    sudo mkdir -p $ARTIFACTS_PATH
-    sudo chown $USER:$USER $ARTIFACTS_PATH
     mkdir -p $ARTIFACTS_PATH/wnd/assemblies/curated
     mkdir -p $ARTIFACTS_PATH/lnx
     mkdir -p $ARTIFACTS_PATH/other
@@ -74,9 +79,18 @@ artifacts() {
     # CheeseSQL (remove FodyWeavers)
     git clone https://github.com/klezVirus/CheeseTools.git $ARTIFACTS_PATH/wnd/assemblies/CheeseTools
     # SharpShares
-    wget https://github.com/mitchmoser/SharpShares/releases/latest/download/SharpShares.exe -O $ARTIFACTS_PATH/wnd/assemblies/curated
+    wget https://github.com/mitchmoser/SharpShares/releases/latest/download/SharpShares.exe -O $ARTIFACTS_PATH/wnd/assemblies/curated/SharpShares.exe
     # SharpRPC
     git clone https://github.com/wavvs/SharpRPC.git $ARTIFACTS_PATH/wnd/assemblies/SharpRPC
+    # WinPeas
+    wget https://github.com/carlospolop/PEASS-ng/releases/latest/download/winPEASany_ofs.exe -O $ARTIFACTS_PATH/wnd/assemblies/curated/winpeas_any.exe
+    # SharpZip
+    git clone https://github.com/SECFORCE/SharpZip $ARTIFACTS_PATH/wnd/assemblies/SharpZip
+    # SharpUp
+    git clone https://github.com/GhostPack/SharpUp.git $ARTIFACTS_PATH/wnd/assemblies/SharpUp
+    # Stracciatella
+    wget https://github.com/mgeeky/Stracciatella/releases/latest/download/Stracciatella.exe -O $ARTIFACTS_PATH/wnd/assemblies/curated/Stracciatella.exe
+
     # ---------- C# assemblies ----------
 
     # doctrack
@@ -94,15 +108,16 @@ artifacts() {
     gzip -d chisel.gz && chmod +x chisel
     wget https://github.com/jpillora/chisel/releases/download/v1.8.1/chisel_1.8.1_windows_amd64.gz -O $ARTIFACTS_PATH/wnd/chisel.gz
     cd $ARTIFACTS_PATH/wnd
-    gzip -d chisel.gz && mv chisel chisel.exe
+    gzip -d chisel.gz
+    mv chisel chisel.exe
     cd $CURPATH
     # wiretap
-    wget https://github.com/sandialabs/wiretap/releases/download/v0.2.1/wiretap_0.2.1_linux_amd64.tar.gz -O $ARTIFACTS_PATH/lnx/wiretap-lnx.tar.gz
+    wget https://github.com/sandialabs/wiretap/releases/download/v0.3.0/wiretap_0.3.0_linux_amd64.tar.gz -O $ARTIFACTS_PATH/lnx/wiretap-lnx.tar.gz
     tar -xf $ARTIFACTS_PATH/lnx/wiretap-lnx.tar.gz -C $ARTIFACTS_PATH/lnx
     chmod +x $ARTIFACTS_PATH/lnx/wiretap
     rm $ARTIFACTS_PATH/lnx/wiretap-lnx.tar.gz
-    wget https://github.com/sandialabs/wiretap/releases/download/v0.2.1/wiretap_0.2.1_windows_amd64.tar.gz -O $ARTIFACTS_PATH/wnd/wiretap-wnd.tar.gz
-    tar -xf $ARTIFACTS_PATH/wnd/wiretap-wnd.tar.gz -C $ARTIFACTS_PATH/lnx
+    wget https://github.com/sandialabs/wiretap/releases/download/v0.3.0/wiretap_0.3.0_windows_amd64.tar.gz -O $ARTIFACTS_PATH/wnd/wiretap-wnd.tar.gz
+    tar -xf $ARTIFACTS_PATH/wnd/wiretap-wnd.tar.gz -C $ARTIFACTS_PATH/wnd
     rm $ARTIFACTS_PATH/wnd/wiretap-wnd.tar.gz
     # mimikatz
     wget https://github.com/gentilkiwi/mimikatz/releases/latest/download/mimikatz_trunk.zip -O $ARTIFACTS_PATH/wnd/mimikatz.zip
@@ -113,6 +128,9 @@ artifacts() {
     # ffuf 
     wget https://github.com/ffuf/ffuf/releases/download/v2.0.0/ffuf_2.0.0_linux_amd64.tar.gz -O $ARTIFACTS_PATH/lnx/ffuf.tar.gz
     tar -xf $ARTIFACTS_PATH/lnx/ffuf.tar.gz -C $ARTIFACTS_PATH/lnx
+    rm $ARTIFACTS_PATH/lnx/CHANGELOG.md
+    rm $ARTIFACTS_PATH/lnx/README.md
+    rm $ARTIFACTS_PATH/lnx/LICENSE
     chmod +x $ARTIFACTS_PATH/lnx/ffuf
     rm $ARTIFACTS_PATH/lnx/ffuf.tar.gz
     # nmap 
@@ -123,14 +141,8 @@ artifacts() {
     git clone https://github.com/hmgle/graftcp.git $ARTIFACTS_PATH/lnx/graftcp
     cd $ARTIFACTS_PATH/lnx/graftcp && make
     cd $CURPATH
-    # osslsigncode
-    # git clone https://github.com/mtrojnar/osslsigncode.git  $ARTIFACTS_PATH/lnx/osslsigncode
-    # mkdir -p $ARTIFACTS_PATH/lnx/osslsigncode/build && cd $ARTIFACTS_PATH/lnx/osslsigncode/build
-    # cmake -S .. && cmake --build .
-    # cd $CURPATH
-    # wix
-    dotnet tool install --global wix --version 4.0.0-rc.4
-    sudo apt install wixl
+    # GadgetToJScript
+    git clone https://github.com/med0x2e/GadgetToJScript.git $ARTIFACTS_PATH/wnd/GadgetToJScript
 
     # ----------- AD & Kerberos --------------
     # nanorobeus
@@ -163,20 +175,26 @@ artifacts() {
     chmod +x $ARTIFACTS_PATH/lnx/kerbrute
     sudo pip3 install kerbrute
     sudo pip3 install pyldapsearch
+    sudo pip2 install --upgrade setuptools
+    sudo pip2 install networkx
+    git clone https://github.com/HarmJ0y/TrustVisualizer $ARTIFACTS_PATH/other/TrustVisualizer  
+    git clone https://github.com/KyhleOhlinger/SYSVOL-Reader $ARTIFACTS_PATH/other/SYSVOL-Reader
+    # PowerView
+    wget https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Recon/PowerView.ps1 -O $ARTIFACTS_PATH/wnd/powerview.ps1
     # ----------- AD & Kerberos --------------
 }
 
 wordlists() {
-    sudo mkdir -p $WORDLISTS_PATH
-    sudo chown $USER:$USER $WORDLISTS_PATH
+    mkdir -p $WORDLISTS_PATH
     git clone https://github.com/danielmiessler/SecLists.git $WORDLISTS_PATH/seclists
+    wget https://raw.githubusercontent.com/Bo0oM/fuzz.txt/master/fuzz.txt -O $WORDLISTS_PATH/fuzz.txt
 }
 
 all() {
     prereq
     bh
     sliver
-    havoc
+    #havoc
     nginx
     artifacts
     wordlists

@@ -10,6 +10,8 @@ DEFAULT_CONFIG = os.path.join(CONFIG_DIR, "default.cfg")
 STANDIN_EXE = 'StandIn.exe'
 SHARPHOUND_EXE = 'SharpHound.exe'
 SHARPSHARES_EXE = 'SharpShares.exe'
+SEATBELT_EXE = 'Seatbelt.exe'
+
 COMMANDS = {
     'ad-recon': 
         {
@@ -27,10 +29,10 @@ COMMANDS = {
             #SHARPHOUND_EXE: [
                 #f'-c All,GPOLocalGroup --zipfilename triage.zip --collectallproperties --zippassword V3ryStr0ngP@ss --randomfilenames'
             #],
-            SHARPSHARES_EXE: ['/ldap:all /filter:sysvol,netlogon,ipc$,print$ /verbose']
+            SHARPSHARES_EXE: ['/ldap:all /filter:sysvol,netlogon,ipc$,print$ /verbose'],
         },
     'triage': {
-
+        SEATBELT_EXE: ['dotnet', 'namedpipes', 'uac', 'scheduledtasks']
     }
 }
 

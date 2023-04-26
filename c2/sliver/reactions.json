@@ -14,11 +14,7 @@
         "sa-netstat",
         "sa-routeprint",
         "sa-tasklist",
-        "sa-netshares",
-        "seatbelt dotnet",
-        "seatbelt namedpipes",
-        "seatbelt uac",
-        "seatbelt scheduledtasks"
+        "sa-netshares"
       ]
     }
   ]
